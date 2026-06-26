@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UET CGPA Calculator</title>
+    <style>
+        :root {
+            --primary-blue: #0f4c81;
+            --secondary-blue: #1d70b8;
+            --light-blue: #eef5fc;
+            --white: #ffffff;
+            --dark-gray: #333333;
+            --border-color: #cccccc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-blue);
+            color: var(--dark-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--white);
+            max-width: 650px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--primary-blue);
+            padding-bottom: 15px;
+        }
+
+        header h1 {
+            color: var(--primary-blue);
+            font-size: 2rem;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: var(--light-blue);
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .control-group label {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .control-group select {
+            padding: 8px 12px;
+            font-size: 1rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            outline: none;
+        }
+
+        .course-row-header {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1.5fr;
+            gap: 15px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--primary-blue);
+            padding: 0 5px;
+        }
+
+        .course-rows {
+            margin-bottom: 20px;
+        }
+
+        .course-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1.5fr;
+            gap: 15px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .course-label {
+            font-weight: 500;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            border-color: var(--secondary-blue);
+        }
+
+        .btn-calc {
+            display: block;
+            width: 100%;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+        }
+
+        .btn-calc:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #e6f7ff;
+            border-left: 5px solid var(--secondary-blue);
+            border-radius: 4px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-box h2 {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--secondary-blue);
+        }
+
+        .instructions {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #666666;
+            text-align: center;
+            border-top: 1px solid #eeeeee;
+            padding-top: 15px;
+            font-style: italic;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 480px) {
+            .course-row-header {
+                display: none;
+            }
+            .course-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                background-color: #fafafa;
+                padding: 12px;
+                border-radius: 6px;
+                border: 1px solid #e0e0e0;
+                margin-bottom: 15px;
+            }
+            .course-label {
+                margin-bottom: 2px;
+                color: var(--primary-blue);
+                font-weight: bold;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>UET CGPA Calculator</h1>
+    </header>
+
+    <div class="control-group">
+        <label for="course-count">Number of Courses:</label>
+        <select id="course-count" onchange="generateCourseRows()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10" selected>10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+        </select>
+    </div>
+
+    <form id="cgpa-form" onsubmit="event.preventDefault(); calculateCGPA();">
+        <div class="course-row-header">
+            <div>Course</div>
+            <div>Grade</div>
+            <div>Credit Hours</div>
+        </div>
+
+        <div id="course-rows-container" class="course-rows">
+            </div>
+
+        <button type="submit" class="btn-calc">Calculate CGPA</button>
+    </form>
+
+    <div id="result-box" class="result-box">
+        <h2>Your Calculated CGPA</h2>
+        <div id="result-value" class="result-value">0.00</div>
+    </div>
+
+    <p class="instructions">
+        Enter your grades and credit hours to calculate your CGPA as per UET rules.
+    </p>
+</div>
+
+<script>
+    // UET rule configurations requested mapping
+    const gradePointsMap = {
+        'A': 4.0,
+        'A-': 3.7,
+        'B+': 3.3,
+        'B-': 2.7,
+        'C+': 2.5,
+        'C-': 2.0,
+        'D': 1.0,
+        'F': 0.0
+    };
+
+    // Builds input nodes dynamically
+    function generateCourseRows() {
+        const container = document.getElementById('course-rows-container');
+        const count = parseInt(document.getElementById('course-count').value);
+        
+        // Retain values if modifying row numbers manually mid-task
+        const currentData = [];
+        const rows = container.getElementsByClassName('course-row');
+        for (let i = 0; i < rows.length; i++) {
+            const grade = rows[i].querySelector('.grade-select').value;
+            const credits = rows[i].querySelector('.credit-input').value;
+            currentData.push({ grade, credits });
+        }
+
+        container.innerHTML = '';
+
+        for (let i = 1; i <= count; i++) {
+            const row = document.createElement('div');
+            row.className = 'course-row';
+
+            const savedGrade = currentData[i - 1] ? currentData[i - 1].grade : 'A';
+            const savedCredits = currentData[i - 1] ? currentData[i - 1].credits : '3';
+
+            row.innerHTML = `
+                <div class="course-label">Course ${i}</div>
+                <div>
+                    <select class="grade-select">
+                        <option value="A" ${savedGrade === 'A' ? 'selected' : ''}>A (4.0)</option>
+                        <option value="A-" ${savedGrade === 'A-' ? 'selected' : ''}>A- (3.7)</option>
+                        <option value="B+" ${savedGrade === 'B+' ? 'selected' : ''}>B+ (3.3)</option>
+                        <option value="B-" ${savedGrade === 'B-' ? 'selected' : ''}>B- (2.7)</option>
+                        <option value="C+" ${savedGrade === 'C+' ? 'selected' : ''}>C+ (2.5)</option>
+                        <option value="C-" ${savedGrade === 'C-' ? 'selected' : ''}>C- (2.0)</option>
+                        <option value="D" ${savedGrade === 'D' ? 'selected' : ''}>D (1.0)</option>
+                        <option value="F" ${savedGrade === 'F' ? 'selected' : ''}>F (0.0)</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="number" class="credit-input" min="1" max="6" step="1" value="${savedCredits}" required>
+                </div>
+            `;
+            container.appendChild(row);
+        }
+    }
+
+    // Mathematical aggregation engine
+    function calculateCGPA() {
+        const gradeSelects = document.getElementsByClassName('grade-select');
+        const creditInputs = document.getElementsByClassName('credit-input');
+
+        let totalGradePoints = 0;
+        let totalCreditHours = 0;
+
+        for (let i = 0; i < gradeSelects.length; i++) {
+            const grade = gradeSelects[i].value;
+            const creditHours = parseFloat(creditInputs[i].value);
+
+            if (!isNaN(creditHours) && creditHours > 0) {
+                const gradePoint = gradePointsMap[grade];
+                totalGradePoints += (gradePoint * creditHours);
+                totalCreditHours += creditHours;
+            }
+        }
+
+        const resultBox = document.getElementById('result-box');
+        const resultValue = document.getElementById('result-value');
+
+        if (totalCreditHours > 0) {
+            const cgpa = totalGradePoints / totalCreditHours;
+            resultValue.textContent = cgpa.toFixed(2);
+            resultBox.style.display = 'block';
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            alert("Please enter valid credit hours.");
+        }
+    }
+
+    // Set defaults right at execution entry
+    window.onload = generateCourseRows;
+</script>
+
+</body>
+</html>
